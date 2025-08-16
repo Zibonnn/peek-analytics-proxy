@@ -18,7 +18,7 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const { measurement_id, event_name, event_params, timestamp } = req.body;
+    const { measurement_id, event_name, event_params, timestamp, client_id } = req.body;
 
     // Validate the request
     if (!measurement_id || !event_name) {
@@ -35,7 +35,7 @@ module.exports = async (req, res) => {
 
     // Prepare the GA4 payload
     const ga4Payload = {
-      client_id: `extension-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      client_id: client_id || `extension-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       events: [{
         name: event_name,
         params: {

@@ -27,7 +27,7 @@ export const handler = async (event, context) => {
   }
 
   try {
-    const { measurement_id, event_name, event_params } = JSON.parse(event.body);
+    const { measurement_id, event_name, event_params, client_id, timestamp } = JSON.parse(event.body);
 
     // Validate the request
     if (!measurement_id || !event_name) {
@@ -52,7 +52,7 @@ export const handler = async (event, context) => {
 
     // Prepare the GA4 payload
     const ga4Payload = {
-      client_id: `extension-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      client_id: client_id || `extension-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       events: [{
         name: event_name,
         params: {
