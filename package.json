@@ -1,0 +1,29 @@
+{
+  "name": "peek-analytics-proxy",
+  "version": "1.0.0",
+  "description": "Secure Google Analytics 4 proxy for Peek extension",
+  "main": "api/analytics.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "node-fetch": "^2.7.0"
+  },
+  "devDependencies": {
+    "vercel": "^32.0.0"
+  },
+  "keywords": [
+    "google-analytics",
+    "ga4",
+    "proxy",
+    "chrome-extension",
+    "analytics",
+    "vercel"
+  ],
+  "author": "Peek Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
