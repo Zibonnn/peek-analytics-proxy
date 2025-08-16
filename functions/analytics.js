@@ -1,36 +1,53 @@
-const fetch = require("node-fetch");
+import fetch from "node-fetch";
 
-module.exports = async (req, res) => {
+export const handler = async (event, context) => {
   // Enable CORS
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  const headers = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type"
+  };
 
   // Handle preflight request
-  if (req.method === "OPTIONS") {
-    res.status(200).end();
-    return;
+  if (event.httpMethod === "OPTIONS") {
+    return {
+      statusCode: 200,
+      headers,
+      body: ""
+    };
   }
 
   // Only allow POST requests
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
+  if (event.httpMethod !== "POST") {
+    return {
+      statusCode: 405,
+      headers,
+      body: JSON.stringify({ error: "Method not allowed" })
+    };
   }
 
   try {
-    const { measurement_id, event_name, event_params, timestamp } = req.body;
+    const { measurement_id, event_name, event_params } = JSON.parse(event.body);
 
     // Validate the request
     if (!measurement_id || !event_name) {
-      return res.status(400).json({ error: "Missing required fields" });
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ error: "Missing required fields" })
+      };
     }
 
-    // Your GA4 API secret (set this in Vercel environment variables)
+    // Your GA4 API secret (set this in Netlify environment variables)
     const GA4_API_SECRET = process.env.GA4_API_SECRET;
 
     if (!GA4_API_SECRET) {
       console.error("GA4_API_SECRET environment variable not set");
-      return res.status(500).json({ error: "Server configuration error" });
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({ error: "Server configuration error" })
+      };
     }
 
     // Prepare the GA4 payload
@@ -65,18 +82,28 @@ module.exports = async (req, res) => {
     }
 
     console.log(`✅ Event tracked successfully: ${event_name}`);
-    res.json({ 
-      success: true, 
-      message: "Event tracked successfully",
-      event: event_name,
-      timestamp: new Date().toISOString()
-    });
+    
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({
+        success: true,
+        message: "Event tracked successfully",
+        event: event_name,
+        timestamp: new Date().toISOString()
+      })
+    };
 
   } catch (error) {
     console.error("❌ Analytics error:", error);
-    res.status(500).json({ 
-      error: "Failed to track event",
-      details: error.message 
-    });
+    
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({
+        error: "Failed to track event",
+        details: error.message
+      })
+    };
   }
 };
